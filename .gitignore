@@ -1,6 +1,7 @@
 # Miscellaneous
 artifacts/
-data/
+data/*
+!data/*.txt
 lightning_logs/
 wandb/
 
