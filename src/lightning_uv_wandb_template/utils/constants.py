@@ -22,4 +22,4 @@ SCHEDULER_FACTOR = 0.1
 
 # Weights & Biases
 WANDB_ENTITY = "golshi-glazer"
-WANDB_PROJECT = "lightning-base"
+WANDB_PROJECT = "lightning-uv-wandb-template"

@@ -1,5 +1,6 @@
-from jute_disease.utils.logger import get_logger
 from lightning.pytorch import seed_everything as lightning_seed_everything
+
+from lightning_uv_wandb_template.utils.logger import get_logger
 
 logger = get_logger(__name__)
 

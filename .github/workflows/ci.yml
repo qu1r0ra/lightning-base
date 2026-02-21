@@ -30,5 +30,11 @@ jobs:
       - name: Install dependencies
         run: uv sync --all-groups
 
-      - name: Run tests
-        run: uv run pytest
+      - name: Code Quality - Format
+        run: uv run ruff format --check .
+
+      - name: Code Quality - Lint
+        run: uv run ruff check .
+
+      - name: Run Pytest
+        run: uv run pytest -v -s -m ''
