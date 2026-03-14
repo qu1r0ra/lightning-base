@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 
 # Project paths
@@ -36,8 +37,8 @@ SCHEDULER_FACTOR = 0.1
 NUM_CLASSES = 5
 
 # Weights & Biases
-WANDB_ENTITY = "golshi-glazer"
-WANDB_PROJECT = "lightning-uv-wandb-template"
+WANDB_ENTITY = os.getenv("WANDB_ENTITY", "golshi-glazer")
+WANDB_PROJECT = os.getenv("WANDB_PROJECT", "lightning-uv-wandb-template")
 
 # Visualization defaults
 DPI = 300

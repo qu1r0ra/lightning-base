@@ -1,22 +1,28 @@
 import torch
 from torchmetrics import Accuracy, F1Score, MetricCollection, Precision, Recall
 
-from lightning_uv_wandb_template.utils.constants import NUM_CLASSES
 
-TRAIN_METRICS = MetricCollection(
-    {"acc": Accuracy(task="multiclass", num_classes=NUM_CLASSES)}
-)
+def get_train_metrics(num_classes: int) -> MetricCollection:
+    """Factory for training metrics."""
+    return MetricCollection(
+        {"acc": Accuracy(task="multiclass", num_classes=num_classes)}
+    )
 
-EVAL_METRICS = MetricCollection(
-    {
-        "acc": Accuracy(task="multiclass", num_classes=NUM_CLASSES),
-        "f1": F1Score(task="multiclass", num_classes=NUM_CLASSES, average="macro"),
-        "precision": Precision(
-            task="multiclass", num_classes=NUM_CLASSES, average="macro"
-        ),
-        "recall": Recall(task="multiclass", num_classes=NUM_CLASSES, average="macro"),
-    }
-)
+
+def get_eval_metrics(num_classes: int) -> MetricCollection:
+    """Factory for evaluation metrics (val/test)."""
+    return MetricCollection(
+        {
+            "acc": Accuracy(task="multiclass", num_classes=num_classes),
+            "f1": F1Score(task="multiclass", num_classes=num_classes, average="macro"),
+            "precision": Precision(
+                task="multiclass", num_classes=num_classes, average="macro"
+            ),
+            "recall": Recall(
+                task="multiclass", num_classes=num_classes, average="macro"
+            ),
+        }
+    )
 
 
 def format_metrics(

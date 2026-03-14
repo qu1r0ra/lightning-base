@@ -67,7 +67,6 @@ def _get_base_val_ops(size: int) -> A.Compose:
     )
 
 
-# Global Normalization Pipeline
 NORMALIZATION_OPS = A.Compose(
     [
         A.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225], p=1.0),
@@ -86,7 +85,6 @@ def create_pipeline(
     else:
         base_group = _get_base_val_ops(image_size)
 
-    # Flatten the groups to ensure deterministic seed behavior across construction
     transforms = list(base_group.transforms)
     if is_dl:
         transforms.extend(list(NORMALIZATION_OPS.transforms))

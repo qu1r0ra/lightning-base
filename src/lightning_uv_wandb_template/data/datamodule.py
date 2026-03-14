@@ -59,7 +59,6 @@ class TemplateDataModule(LightningDataModule):
         self.sampler: WeightedRandomSampler | None = None
         self._classes: list[str] | None = None
 
-        # K-Fold state
         self._splits: list[tuple[np.ndarray, np.ndarray]] | None = None
         self._pool_labels: list[int] | None = None
         self._train_pool: ConcatDataset | None = None
@@ -94,10 +93,8 @@ class TemplateDataModule(LightningDataModule):
 
     def setup(self, stage: str | None = None) -> None:
         if stage == "fit" or stage is None:
-            # Check if we have pre-split train/val folders
             if self.train_dir.exists() and self.val_dir.exists():
                 if self.hparams.k_fold > 1:
-                    # Initialize Stratified K-Fold over the combined train+val folders
                     train_ds_no_aug = ImageFolder(root=self.train_dir)
                     val_ds_no_aug = ImageFolder(root=self.val_dir)
 
@@ -113,7 +110,6 @@ class TemplateDataModule(LightningDataModule):
                         skf.split(np.zeros(len(self._pool_labels)), self._pool_labels)
                     )
 
-                    # Create pools with appropriate transforms
                     self._train_pool = ConcatDataset(
                         [
                             ImageFolder(
@@ -137,7 +133,6 @@ class TemplateDataModule(LightningDataModule):
 
                     self.set_fold(self.hparams.fold_index)
                 else:
-                    # Simple train/val from folders
                     self.train_dataset = ImageFolder(
                         root=self.train_dir, transform=self.train_transform
                     )
@@ -152,7 +147,6 @@ class TemplateDataModule(LightningDataModule):
                         )
 
             elif self.data_dir.exists():
-                # Split from a single directory
                 full_ds = ImageFolder(root=self.data_dir)
                 self._classes = full_ds.classes
 

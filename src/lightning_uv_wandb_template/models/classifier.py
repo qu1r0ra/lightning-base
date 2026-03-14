@@ -12,7 +12,10 @@ from lightning_uv_wandb_template.utils.constants import (
     SCHEDULER_FACTOR,
     SCHEDULER_PATIENCE,
 )
-from lightning_uv_wandb_template.utils.metrics import EVAL_METRICS, TRAIN_METRICS
+from lightning_uv_wandb_template.utils.metrics import (
+    get_eval_metrics,
+    get_train_metrics,
+)
 
 
 class TemplateClassifier(LightningModule):
@@ -37,9 +40,9 @@ class TemplateClassifier(LightningModule):
         self.scheduler_factor = scheduler_factor
         self.save_hyperparameters(ignore=["model"])
 
-        self.train_metrics = TRAIN_METRICS.clone(prefix="train_")
-        self.val_metrics = EVAL_METRICS.clone(prefix="val_")
-        self.test_metrics = EVAL_METRICS.clone(prefix="test_")
+        self.train_metrics = get_train_metrics(num_classes).clone(prefix="train_")
+        self.val_metrics = get_eval_metrics(num_classes).clone(prefix="val_")
+        self.test_metrics = get_eval_metrics(num_classes).clone(prefix="test_")
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         return self.model(x)
