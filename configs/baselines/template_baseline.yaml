@@ -31,16 +31,16 @@ model:
     dropout: 0.1
     scheduler_patience: 3
     scheduler_factor: 0.1
-    num_classes: 6
+    num_classes: 5
     model:
       class_path: torchvision.models.resnet18
       init_args:
-        num_classes: 6
+        num_classes: 5
 
 data:
   class_path: lightning_uv_wandb_template.data.datamodule.TemplateDataModule
   init_args:
-    data_dir: data
+    data_dir: data/ml_split
     batch_size: 32
     val_split: 0.2
     num_workers: 4
