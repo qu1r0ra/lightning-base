@@ -3,7 +3,7 @@ name = "lightning-uv-wandb-template"
 version = "0.1.0"
 description = "A template repository for PyTorch Lightning-centric projects."
 readme = "README.md"
-requires-python = "==3.11.14"
+requires-python = ">=3.11.14"
 dependencies = [
     "albumentations>=2.0.8",
     "ipykernel>=7.2.0",
