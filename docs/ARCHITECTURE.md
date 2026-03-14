@@ -19,11 +19,10 @@ This document describes the architectural design and directory structure of the 
 ├── notebooks/              # Jupyter notebooks for EDA, prototyping, and analysis
 │   ├── dev/                # Experimental and scratchpad notebooks
 │   └── reproducibility/    # Numbered notebooks to replicate project results
-├── scripts/                # Utility scripts for batch training, grid search, and validation
+├── scripts/                # Entry points for training (train.py), grid search, and validation
 ├── src/                    # Source code package
 │   └── lightning_uv_wandb_template/     # Main library package
 │       ├── data/           # LightningDataModules, transforms, and data utilities
-│       ├── engines/        # Training routines, script wrappers, and Lightning CLI
 │       ├── models/         # LightningModule wrapping definitions
 │       └── utils/          # Shared utilities (logging, constants)
 ├── tests/                  # Hierarchical test suite mirroring src/ structure
@@ -48,8 +47,8 @@ Each subpackage in `src/lightning_uv_wandb_template/` (e.g., `engines`, `models`
 
 The pipeline is built using **PyTorch Lightning** for state-of-the-art reproducibility and boilerplate reduction.
 
-- **LightningModule (`TemplateClassifier`)**: The core class handling the training loop, optimization, logging, and metrics. It wraps any standard `nn.Module`.
-- **Lightning CLI**: Training is driven by configuration files in `configs/`, promoting "Configuration as Code". The CLI supports overrides via command-line arguments.
+- **LightningModule (`TemplateClassifier`)**: The core class handling the training loop, optimization, logging, and metrics. It wraps any standard `nn.Module` and utilizes centralized `MetricCollection` for streamlined multi-metric tracking (Accuracy, F1, etc.).
+- **Lightning CLI**: The main entry point is `scripts/train.py`, which uses configuration files in `configs/` to promote "Configuration as Code". The CLI supports overrides via command-line arguments.
 
 ### 3. Data Management & Reproducibility
 
@@ -68,4 +67,5 @@ The pipeline is built using **PyTorch Lightning** for state-of-the-art reproduci
 
 - **uv**: Package management and environment isolation.
 - **PyTorch Lightning**: Deep learning framework.
+- **Albumentations**: Fast and flexible image augmentation library.
 - **WandB**: Experiment tracking and visualization.
