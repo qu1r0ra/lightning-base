@@ -7,7 +7,7 @@
 ![Year, Term, Course](https://img.shields.io/badge/AY2526--T2-GORUSHI-blue)
 ![Python](https://img.shields.io/badge/Python-3776AB?logo=python&logoColor=white) ![PyTorch](https://img.shields.io/badge/PyTorch-ee4c2c?logo=pytorch&logoColor=white) ![Lightning](https://img.shields.io/badge/Lightning-792ee5?logo=lightning&logoColor=white) ![Jupyter](https://img.shields.io/badge/Jupyter-f37626?logo=jupyter&logoColor=white)
 
-A deep learning project template integrating PyTorch Lightning, `uv`, and Weights & Biases (WandB). This structure is adapted from my [Jute disease detection](https://github.com/qu1r0ra/jute-disease-detection) project.
+A deep learning project template integrating PyTorch Lightning, `uv`, and Weights & Biases (WandB). This structure is designed to be modular and easy to adapt for any image classification task.
 
 ## Table of Contents <!-- omit from toc -->
 
