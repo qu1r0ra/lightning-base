@@ -73,7 +73,7 @@ To reproduce our results, you will need the following installed:
 
 1. **Git:** Used to clone this repository.
 
-2. **Python:** We require Python `3.11.14` for this project. You do not need to install the specific version as it will be installed by `uv`.
+2. **Python:** We require Python `3.11` for this project. You do not need to install the specific version as it will be installed by `uv`.
 
 3. **uv:** The package manager we used. Installation instructions can be found at <https://docs.astral.sh/uv/getting-started/installation/>.
 
@@ -92,7 +92,14 @@ To reproduce our results, you will need the following installed:
    uv sync
    ```
 
-3. Run through the Jupyter notebooks in `notebooks/reproducibility/` in numerical order:
+3. Prepare the dataset:
+   Ensure your raw data is in `data/by_class` (or use `make data-init` if you have a `data.zip` there).
+
+   ```bash
+   make data-init
+   ```
+
+4. Run through the Jupyter notebooks in `notebooks/reproducibility/` in numerical order:
    1. `01_Exploratory_Data_Analysis.ipynb`
    2. `02_Model_Selection_Training.ipynb`
    3. ...
