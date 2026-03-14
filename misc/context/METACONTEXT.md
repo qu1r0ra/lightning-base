@@ -15,6 +15,16 @@ This document captures high-level insights, architectural decisions, and documen
 - **Insight**: Document the relationship between input resolution and model performance for specific architectures.
 - **Verdict**: Specify the optimal resolution and the reasoning (e.g., kernel size alignment or feature dilation).
 
+### 3. Data Augmentation Strategy
+
+- **Insight**: Use `albumentations` via an adapter for more robust and varied augmentations (Rotation, Symmetry, Dropout, Jitter) compared to standard `torchvision` transforms.
+- **Benefit**: Significantly improves generalization on small or noisy datasets.
+
+### 4. Evaluation and Imbalance Handling
+
+- **Insight**: Use `StratifiedKFold` to maintain class distribution across folds. Use `WeightedRandomSampler` during training if classes are imbalanced.
+- **Convention**: Set `k_fold > 1` in the `TemplateDataModule` to enable CV mode.
+
 ## Implementation Standards
 
 ### 1. Scripting Pattern: "Raise in Logic, Exit in Main"
@@ -27,6 +37,12 @@ This document captures high-level insights, architectural decisions, and documen
 
 - **Quirks**: Document any hardware-specific or OS-specific behavior (e.g., MPS vs CUDA vs CPU quirks).
 - **Reproducibility**: Note any deviations from the standard environment that were required for specific experiments.
+- **UV Path**: `Makefile` now uses a shortened, OS-agnostic path resolution for `uv`.
+
+### 3. Centralized Metric Management
+
+- **Standard**: Define all training and evaluation metrics in `src/lightning_uv_wandb_template/utils/metrics.py` using `MetricCollection`.
+- **Integration**: `LightningModule` subclasses should clone these collections to ensure consistent metric computation across different stages (train/val/test).
 
 ## Architectural Debt and Design Choices
 
@@ -37,7 +53,7 @@ This document captures high-level insights, architectural decisions, and documen
 
 ## Current Status
 
-- **Deep Learning**: [Status]
-- **Classical ML**: [Status]
-- **Data Pipeline**: [Status]
-- **Next Task**: [Immediate priority]
+- **Deep Learning**: Advanced `TemplateClassifier` implemented with centralized metrics and AdamW/ReduceLROnPlateau.
+- **Classical ML**: Scikit-learn integrated for advanced splitting (Stratified K-Fold).
+- **Data Pipeline**: Automated with `make data-init` (unzip, setup, split). Using Albumentations for augmentation.
+- **Next Task**: Model training and evaluation on specific datasets.
