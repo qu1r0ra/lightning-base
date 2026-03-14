@@ -28,6 +28,10 @@ Welcome! This document provides crucial context, architectural design choices, a
 - **Line length**: Be mindful of line limits. If a line is too long, break it naturally.
 - **Mandatory Step**: _Always_ run `make format` after modifying `.py` files to ensure compliance before concluding a task.
 
+### 2.3. No Emojis
+
+- **Visual Consistency**: High-quality, professional codebases avoid the use of emojis. Do not use emojis in code, comments, or documentation files (Markdown).
+
 ## 3. Architecture Pointers
 
 Review [`ARCHITECTURE.md`](../ARCHITECTURE.md) for full details, but keep these core concepts in mind:
