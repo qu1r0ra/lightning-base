@@ -8,18 +8,19 @@ from torch.optim.lr_scheduler import ReduceLROnPlateau
 from lightning_uv_wandb_template.utils.constants import (
     DEFAULT_DROPOUT,
     DEFAULT_LR,
-    DEFAULT_NUM_CLASSES,
     DEFAULT_WEIGHT_DECAY,
+    NUM_CLASSES,
     SCHEDULER_FACTOR,
     SCHEDULER_PATIENCE,
 )
+from lightning_uv_wandb_template.utils.metrics import EVAL_METRICS, TRAIN_METRICS
 
 
 class TemplateClassifier(LightningModule):
     def __init__(
         self,
         model: nn.Module,
-        num_classes: int = DEFAULT_NUM_CLASSES,
+        num_classes: int = NUM_CLASSES,
         lr: float = DEFAULT_LR,
         weight_decay: float = DEFAULT_WEIGHT_DECAY,
         dropout: float = DEFAULT_DROPOUT,
@@ -30,7 +31,6 @@ class TemplateClassifier(LightningModule):
         self.model = model
         self.loss = nn.CrossEntropyLoss()
 
-        self.num_classes = num_classes
         self.lr = lr
         self.weight_decay = weight_decay
         self.dropout = dropout
@@ -38,19 +38,9 @@ class TemplateClassifier(LightningModule):
         self.scheduler_factor = scheduler_factor
         self.save_hyperparameters(ignore=["model"])
 
-        self.train_acc = torchmetrics.Accuracy(
-            task="multiclass", num_classes=num_classes
-        )
-        self.val_acc = torchmetrics.Accuracy(task="multiclass", num_classes=num_classes)
-        self.val_f1 = torchmetrics.F1Score(
-            task="multiclass", num_classes=num_classes, average="macro"
-        )
-        self.test_acc = torchmetrics.Accuracy(
-            task="multiclass", num_classes=num_classes
-        )
-        self.test_f1 = torchmetrics.F1Score(
-            task="multiclass", num_classes=num_classes, average="macro"
-        )
+        self.train_metrics = TRAIN_METRICS.clone(prefix="train_")
+        self.val_metrics = EVAL_METRICS.clone(prefix="val_")
+        self.test_metrics = EVAL_METRICS.clone(prefix="test_")
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         return self.model(x)
@@ -63,10 +53,8 @@ class TemplateClassifier(LightningModule):
         loss = self.loss(y_hat, y)
 
         self.log("train_loss", loss, prog_bar=True)
-        self.train_acc(y_hat, y)
-        self.log(
-            "train_acc", self.train_acc, prog_bar=True, on_step=False, on_epoch=True
-        )
+        output = self.train_metrics(y_hat, y)
+        self.log_dict(output, prog_bar=True, on_step=False, on_epoch=True)
 
         return loss
 
@@ -78,10 +66,8 @@ class TemplateClassifier(LightningModule):
         loss = self.loss(y_hat, y)
 
         self.log("val_loss", loss, prog_bar=True)
-        self.val_acc(y_hat, y)
-        self.val_f1(y_hat, y)
-        self.log("val_acc", self.val_acc, prog_bar=True, on_step=False, on_epoch=True)
-        self.log("val_f1", self.val_f1, prog_bar=True, on_step=False, on_epoch=True)
+        output = self.val_metrics(y_hat, y)
+        self.log_dict(output, prog_bar=True, on_step=False, on_epoch=True)
 
         return loss
 
@@ -93,12 +79,8 @@ class TemplateClassifier(LightningModule):
         loss = self.loss(y_hat, y)
 
         self.log("test_loss", loss)
-
-        self.test_acc(y_hat, y)
-        self.log("test_acc", self.test_acc)
-
-        self.test_f1(y_hat, y)
-        self.log("test_f1", self.test_f1)
+        output = self.test_metrics(y_hat, y)
+        self.log_dict(output)
 
         return loss
 
