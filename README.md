@@ -52,7 +52,6 @@ A high-level overview of the repository organization:
 │   └── lightning_uv_wandb_template/     # Main library package
 │       ├── data/           # LightningDataModules, transforms, and data utilities
 │       ├── models/         # LightningModule wrapping definitions
-│       ├── schemas/        # Pydantic validation schemas
 │       └── utils/          # Shared utilities (logging, constants)
 ├── tests/                  # Hierarchical test suite mirroring src/ structure
 │   ├── data/               # Data structure tests

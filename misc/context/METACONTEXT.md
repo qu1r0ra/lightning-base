@@ -48,12 +48,7 @@ This document captures high-level insights, architectural decisions, and documen
 - **Insight**: Unit tests verify isolated logic, but don't catch loop failures.
 - **Standard**: Use `fast_dev_run=True` in integration tests (`tests/integration/`) with mock data to smoke-test the entire training loop efficiently.
 
-### 5. Pydantic Schemas
-
-- **Insight**: Moved validation logic to a dedicated `src/lightning_uv_wandb_template/schemas/` package.
-- **Benefit**: Separates configuration validation from general utilities, providing a structured way to handle hyperparameters outside of YAML.
-
-### 6. Entry Point Reorganization
+### 5. Entry Point Reorganization
 
 - **Insight**: Decoupled the core `LightningCLI` runner from top-level project scripts.
 - **Verdict**: The main entry point is `scripts/train.py`, which is invoked by higher-level runners (e.g., `train_full.py`, `train_grid_search.py`) via subprocesses. This ensures that experiment logic remains isolated and cleanly configurable.
@@ -70,7 +65,6 @@ This document captures high-level insights, architectural decisions, and documen
 - **Deep Learning**: `TemplateClassifier` implemented with centralized metrics and dynamic factory patterns.
 - **Classical ML**: Scikit-learn integrated for advanced splitting (Stratified K-Fold).
 - **Data Pipeline**: Automated with `make data-init`. Using Albumentations for augmentation.
-- **Validation**: Strict Pydantic schemas implemented in `schemas/config.py`.
 - **Infrastructure**: Entry points reorganized under `scripts/` with decoupled CLI logic.
 - **Testing**: Passing 6 tests, including end-to-end training loop smoke tests.
 - **Quality**: Verified clean state (formatting, linting, notebook sync) via `make full-check`.

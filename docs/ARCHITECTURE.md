@@ -24,7 +24,6 @@ This document describes the architectural design and directory structure of the 
 │   └── lightning_uv_wandb_template/     # Main library package
 │       ├── data/           # LightningDataModules, transforms, and data utilities
 │       ├── models/         # LightningModule wrapping definitions
-│       ├── schemas/        # Pydantic validation schemas
 │       └── utils/          # Shared utilities (logging, constants)
 ├── tests/                  # Hierarchical test suite mirroring src/ structure
 │   ├── data/               # Data structure tests
@@ -39,7 +38,7 @@ This document describes the architectural design and directory structure of the 
 
 ### 1. Unified Public API
 
-Each subpackage in `src/lightning_uv_wandb_template/` (e.g., `data`, `models`, `schemas`, `utils`) uses `__init__.py` to expose a clean, flattened public API where applicable.
+Each subpackage in `src/lightning_uv_wandb_template/` (e.g., `data`, `models`, `utils`) uses `__init__.py` to expose a clean, flattened public API where applicable.
 
 - **Internal developers** use relative imports where appropriate or `from lightning_uv_wandb_template.x import y` to avoid circular dependencies.
 - **External consumers** (scripts, tests, notebooks) use the clean package-level imports.
@@ -69,5 +68,4 @@ The pipeline is built using **PyTorch Lightning** for state-of-the-art reproduci
 - **uv**: Package management and environment isolation.
 - **PyTorch Lightning**: Deep learning framework.
 - **Albumentations**: Fast and flexible image augmentation library.
-- **Pydantic**: Data validation and settings management using Python type annotations.
 - **WandB**: Experiment tracking and visualization.
