@@ -1,7 +1,8 @@
-# Miscellaneous
-artifacts/
-data/*
-!data/*.txt
+# Additions
+# artifacts
+# data/*
+# !data/*.txt
+# misc
 lightning_logs/
 wandb/
 

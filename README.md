@@ -7,7 +7,7 @@
 ![Year, Term, Course](https://img.shields.io/badge/AY2526--T2-GORUSHI-blue)
 ![Python](https://img.shields.io/badge/Python-3776AB?logo=python&logoColor=white) ![PyTorch](https://img.shields.io/badge/PyTorch-ee4c2c?logo=pytorch&logoColor=white) ![Lightning](https://img.shields.io/badge/Lightning-792ee5?logo=lightning&logoColor=white) ![Jupyter](https://img.shields.io/badge/Jupyter-f37626?logo=jupyter&logoColor=white)
 
-A deep learning project template integrating PyTorch Lightning, `uv`, and Weights & Biases (WandB). This structure is adapted from my [Jute disease detection](https://github.com/qu1r0ra/jute-disease-detection) project.
+A deep learning project template integrating PyTorch Lightning, `uv`, and Weights & Biases (WandB). This structure is designed to be modular and easy to adapt for any image classification task.
 
 ## Table of Contents <!-- omit from toc -->
 
@@ -51,7 +51,6 @@ A high-level overview of the repository organization:
 ├── src/                    # Source code package
 │   └── lightning_uv_wandb_template/     # Main library package
 │       ├── data/           # LightningDataModules, transforms, and data utilities
-│       ├── engines/        # Training routines, script wrappers, and Lightning CLI
 │       ├── models/         # LightningModule wrapping definitions
 │       └── utils/          # Shared utilities (logging, constants)
 ├── tests/                  # Hierarchical test suite mirroring src/ structure
@@ -73,7 +72,7 @@ To reproduce our results, you will need the following installed:
 
 1. **Git:** Used to clone this repository.
 
-2. **Python:** We require Python `3.11.14` for this project. You do not need to install the specific version as it will be installed by `uv`.
+2. **Python:** We require Python `3.11` for this project. You do not need to install the specific version as it will be installed by `uv`.
 
 3. **uv:** The package manager we used. Installation instructions can be found at <https://docs.astral.sh/uv/getting-started/installation/>.
 
@@ -92,7 +91,14 @@ To reproduce our results, you will need the following installed:
    uv sync
    ```
 
-3. Run through the Jupyter notebooks in `notebooks/reproducibility/` in numerical order:
+3. Prepare the dataset:
+   Ensure your raw data is in `data/by_class` (or use `make data-init` if you have a `data.zip` there).
+
+   ```bash
+   make data-init
+   ```
+
+4. Run through the Jupyter notebooks in `notebooks/reproducibility/` in numerical order:
    1. `01_Exploratory_Data_Analysis.ipynb`
    2. `02_Model_Selection_Training.ipynb`
    3. ...

@@ -1,0 +1,121 @@
+%%%%% Main Papers %%%%%
+
+@inproceedings{haqueAdvancementsJuteLeaf2024,
+  title      = {Advancements in {{Jute Leaf Disease Detection}}: {{A Comprehensive Study Utilizing Machine Learning}} and {{Deep Learning Techniques}}},
+  shorttitle = {Advancements in {{Jute Leaf Disease Detection}}},
+  booktitle  = {2024 {{IEEE International Conference}} on {{Power}}, {{Electrical}}, {{Electronics}} and {{Industrial Applications}} ({{PEEIACON}})},
+  author     = {Haque, Rezaul and Miah, Md Miraz and Sultana, Shayma and Fardin, Hasib and Noman, Abdullah Al and {Al-Sakib}, Abdullah and Hasan, Md Kamrul and Rafy, Al and Shihabur, Rahman Md and Rahman, Shafiur},
+  year       = 2024,
+  month      = sep,
+  pages      = {248--253},
+  doi        = {10.1109/PEEIACON63629.2024.10800378},
+  urldate    = {2026-01-24},
+  abstract   = {Detecting diseases in jute leaves is difficult due to the variability in how the diseases appear. Manually identifying these diseases is challenging because it requires expert knowledge and visual inspections take a lot of time. Machine Learning (ML) offers a promising solution to these challenges by automating the detection process. However, research in this area is limited due to the lack of specific datasets. This study aims to address this by creating a comprehensive dataset of 10,800 high-quality images of jute leaf diseases. The main goal is to develop a robust system for classifying jute leaves into three categories: Yellow Mosaic, Powdery Mildew, and Healthy. Our methodology involved extensive image preprocessing, including resizing and various augmentation techniques, to enhance the dataset's diversity and ensure model robustness. We trained various ML and Deep Learning (DL) models and conducted a comparative analysis of their performance. Additionally, we compared our approach with the state-of-the-art methods. The results showed that DL models, particularly Inception V3, achieved an outstanding accuracy of 99.98\%, compared to 89.75\% for Random Forest (RF). This highlights the potential of DL techniques in improving the accuracy of jute leaf disease detection. Our findings contribute to better disease management strategies and increased productivity in jute cultivation.},
+  keywords   = {Accuracy,Analytical models,crop management,Deep learning,Diseases,leaf disease,machine learning,plant pathology,Radio frequency,Random forests,Real-time systems,Robustness,Sustainable agriculture,Transfer learning,Visualization}
+}
+
+%%%%% Architectures %%%%%
+
+@article{mehta2021mobilevit,
+  title={Mobilevit: light-weight, general-purpose, and mobile-friendly vision transformer},
+  author={Mehta, Sachin and Rastegari, Mohammad},
+  journal={arXiv preprint arXiv:2110.02178},
+  year={2021}
+}
+
+%%%%% Datasets %%%%%
+
+@article{islamComprehensiveImageDataset2026,
+  title    = {A Comprehensive Image Dataset of Jute Diseases},
+  author   = {Islam, Md. Masudul and Sheikh, Md. Ripon},
+  year     = 2026,
+  month    = feb,
+  journal  = {Data in Brief},
+  volume   = {64},
+  pages    = {112334},
+  issn     = {2352-3409},
+  doi      = {10.1016/j.dib.2025.112334},
+  urldate  = {2026-01-23},
+  abstract = {This Data Descriptor presents the Jute Diseases Image Dataset; a curated collection of 1390 high-resolution images aimed at supporting the development of machine learning models for timely identification and accurate diagnosis of jute (Corchorus) plant diseases. The dataset is categorized into five classes: Dieback (300), Holed (300), Mosaic (240), Stem Soft Rot (270), and Fresh (280) representing healthy leaves. Images were captured under varied natural lighting and directional conditions across diverse jute cultivation areas to enhance model generalizability. A rigorous pre-processing pipeline was applied, including uniform resizing to 1024 \texttimes{} 1024 pixels and removal of duplicate images to ensure data integrity. The dataset is organized into two components: a raw, pre-processed set and an augmented train-test split version, enabling immediate use in machine learning workflows. Additionally, Grad-CAM and Guided Grad-CAM techniques were applied to sample images to visualize and validate model attention on disease-relevant regions. This resource addresses the lack of labelled jute disease imagery and supports timely disease management, particularly for stakeholders in Bangladesh and other major jute-producing regions.},
+  keywords = {Agriculture,Computer Vision,Crop disease,Image Dataset,Jute dataset,Jute disease},
+  file     = {/home/qu1r0ra/Zotero/storage/CD8BWZIB/Islam and Sheikh - 2026 - A comprehensive image dataset of jute diseases.pdf;/home/qu1r0ra/Zotero/storage/KI7T7PUM/S2352340925010480.html}
+}
+
+%%%%% Software %%%%%
+
+% PyTorch
+@inproceedings{ansel2024pytorch,
+  author    = {Ansel, Jason and Yang, Edward and He, Horace and Gimelshein, Natalia and Jain, Animesh and Voznesensky, Michael and Bao, Bin and Bell, Peter and Berard, David and Burovski, Evgeni and Chauhan, Geeta and Chourdia, Anjali and Constable, Will and Desmaison, Alban and DeVito, Zachary and Ellison, Elias and Feng, Will and Gong, Jiong and Gschwind, Michael and Hirsh, Brian and Huang, Sherlock and Kalambarkar, Kshiteej and Kirsch, Laurent and Lazos, Michael and Lezcano, Mario and Liang, Yanbo and Liang, Jason and Lu, Yinghai and Luk, C. K. and Maher, Bert and Pan, Yunjie and Puhrsch, Christian and Reso, Matthias and Saroufim, Mark and Siraichi, Marcos Yukio and Suk, Helen and Zhang, Shunting and Suo, Michael and Tillet, Phil and Zhao, Xu and Wang, Eikan and Zhou, Keren and Zou, Richard and Wang, Xiaodong and Mathews, Ajit and Wen, William and Chanan, Gregory and Wu, Peng and Chintala, Soumith},
+  title     = {PyTorch 2: Faster Machine Learning Through Dynamic Python Bytecode Transformation and Graph Compilation},
+  year      = {2024},
+  isbn      = {9798400703850},
+  publisher = {Association for Computing Machinery},
+  address   = {New York, NY, USA},
+  url       = {https://doi.org/10.1145/3620665.3640366},
+  doi       = {10.1145/3620665.3640366},
+  abstract  = {This paper introduces two extensions to the popular PyTorch machine learning framework, TorchDynamo and TorchInductor, which implement the torch.compile feature released in PyTorch 2. TorchDynamo is a Python-level just-in-time (JIT) compiler that enables graph compilation in PyTorch programs without sacrificing the flexibility of Python. It achieves this by dynamically modifying Python bytecode before execution and extracting sequences of PyTorch operations into an FX graph, which is then JIT compiled using one of many extensible backends. TorchInductor is the default compiler backend for TorchDynamo, which translates PyTorch programs into OpenAI's Triton for GPUs and C++ for CPUs. Results show that TorchDynamo is able to capture graphs more robustly than prior approaches while adding minimal overhead, and TorchInductor is able to provide a 2.27\texttimes{} inference and 1.41\texttimes{} training geometric mean speedup on an NVIDIA A100 GPU across 180+ real-world models, which outperforms six other compilers. These extensions provide a new way to apply optimizations through compilers in eager mode frameworks like PyTorch.},
+  booktitle = {Proceedings of the 29th ACM International Conference on Architectural Support for Programming Languages and Operating Systems, Volume 2},
+  pages     = {929–947},
+  numpages  = {19},
+  location  = {La Jolla, CA, USA},
+  series    = {ASPLOS '24}
+}
+
+% PyTorch Lightning
+@software{falcon2026lightning,
+  author    = {Falcon, William and
+               The PyTorch Lightning team},
+  title     = {PyTorch Lightning},
+  month     = jan,
+  year      = 2026,
+  publisher = {Zenodo},
+  version   = {2.6.1},
+  doi       = {10.5281/zenodo.18432694},
+  url       = {https://doi.org/10.5281/zenodo.18432694},
+  swhid     = {swh:1:dir:657efefce6d8c12d566ac085d732128b420409f5
+               ;origin=https://doi.org/10.5281/zenodo.3530844;vis
+               it=swh:1:snp:88a874830ab5a55e27b3518a3d148dbee1bfb
+               b65;anchor=swh:1:rel:e58c29aaca765d3d5374942dcd349
+               9bd963680fd;path=Lightning-AI-pytorch-
+               lightning-655a3a9
+               }
+}
+
+% uv
+@software{astral2026uv,
+  author = {{Astral}},
+  title = {uv: An extremely fast Python package and project manager},
+  year = {2026},
+  url = {https://github.com/astral-sh/uv},
+  note = {Accessed: 2026-03-13}
+}
+
+% Weights and Biases
+@misc{biewald2020wandb,
+  title  = {Experiment Tracking with Weights and Biases},
+  year   = {2020},
+  note   = {Software available from wandb.com},
+  url    = {https://www.wandb.com/},
+  author = {Biewald, Lukas}
+}
+
+%%%%% Others %%%%%
+
+% t-SNE
+@article{wattenberg2016tsne,
+  author  = {Wattenberg, Martin and Viégas, Fernanda and Johnson, Ian},
+  title   = {How to Use t-SNE Effectively},
+  journal = {Distill},
+  year    = {2016},
+  url     = {http://distill.pub/2016/misread-tsne},
+  doi     = {10.23915/distill.00002}
+}
+
+% UMAP
+@article{coenen2019umap,
+  author    = {Coenen, Andy and Pearce, Adam},
+  title     = {Understanding UMAP},
+  publisher = {Google PAIR},
+  year      = {2019},
+  url       = {https://pair-code.github.io/understanding-umap/}
+}

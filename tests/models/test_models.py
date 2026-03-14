@@ -15,7 +15,7 @@ def test_template_classifier_init() -> None:
         dropout=0.1,
     )
 
-    assert classifier.num_classes == 6
+    assert classifier.hparams.num_classes == 6
     assert classifier.lr == 1e-3
     assert classifier.weight_decay == 0.01
     assert classifier.dropout == 0.1

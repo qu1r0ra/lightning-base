@@ -28,6 +28,11 @@ Welcome! This document provides crucial context, architectural design choices, a
 - **Line length**: Be mindful of line limits. If a line is too long, break it naturally.
 - **Mandatory Step**: _Always_ run `make format` after modifying `.py` files to ensure compliance before concluding a task.
 
+### 2.3. Clean Code Practices
+
+- **No Emojis**: Do not use emojis in code, comments, or documentation files (Markdown).
+- **No Unnecessary Inline Comments**: Avoid obvious or redundant inline comments (starting with `#`). Code should be self-documenting; use comments only for explaining complex algorithms or non-obvious "why" decisions. Docstrings are still encouraged for public APIs.
+
 ## 3. Architecture Pointers
 
 Review [`ARCHITECTURE.md`](../ARCHITECTURE.md) for full details, but keep these core concepts in mind:

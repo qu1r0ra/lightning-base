@@ -1,20 +1,24 @@
 import os
 import sys
 
+import typer
+
 from lightning_uv_wandb_template.utils.logger import get_logger
 
 logger = get_logger(__name__)
+app = typer.Typer(help="Full Training Pipeline")
 
 
-def main() -> None:
-    config_path = "configs/baselines/template.yaml"
-    cmd = (
-        f"uv run python src/lightning_uv_wandb_template/engines/cli.py fit "
-        f"--config {config_path}"
-    )
+@app.command()
+def train(config: str = "configs/baselines/template_baseline.yaml") -> None:
+    """Run full training pipeline with PyTorch Lightning CLI."""
+    cmd = f"{sys.executable} scripts/train.py fit --config {config}"
     logger.info(f"Executing: {cmd}")
-    sys.exit(os.system(cmd))
+    exit_code = os.system(cmd)
+    if exit_code != 0:
+        logger.error(f"Command failed with exit code {exit_code}")
+        sys.exit(exit_code)
 
 
 if __name__ == "__main__":
-    main()
+    app()

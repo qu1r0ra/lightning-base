@@ -19,11 +19,10 @@ This document describes the architectural design and directory structure of the 
 ├── notebooks/              # Jupyter notebooks for EDA, prototyping, and analysis
 │   ├── dev/                # Experimental and scratchpad notebooks
 │   └── reproducibility/    # Numbered notebooks to replicate project results
-├── scripts/                # Utility scripts for batch training, grid search, and validation
+├── scripts/                # Entry points for training (train.py), grid search, and validation
 ├── src/                    # Source code package
 │   └── lightning_uv_wandb_template/     # Main library package
 │       ├── data/           # LightningDataModules, transforms, and data utilities
-│       ├── engines/        # Training routines, script wrappers, and Lightning CLI
 │       ├── models/         # LightningModule wrapping definitions
 │       └── utils/          # Shared utilities (logging, constants)
 ├── tests/                  # Hierarchical test suite mirroring src/ structure
@@ -39,7 +38,7 @@ This document describes the architectural design and directory structure of the 
 
 ### 1. Unified Public API
 
-Each subpackage in `src/lightning_uv_wandb_template/` (e.g., `engines`, `models`, `data`, `utils`) uses `__init__.py` to expose a clean, flattened public API where applicable.
+Each subpackage in `src/lightning_uv_wandb_template/` (e.g., `data`, `models`, `utils`) uses `__init__.py` to expose a clean, flattened public API where applicable.
 
 - **Internal developers** use relative imports where appropriate or `from lightning_uv_wandb_template.x import y` to avoid circular dependencies.
 - **External consumers** (scripts, tests, notebooks) use the clean package-level imports.
@@ -48,8 +47,8 @@ Each subpackage in `src/lightning_uv_wandb_template/` (e.g., `engines`, `models`
 
 The pipeline is built using **PyTorch Lightning** for state-of-the-art reproducibility and boilerplate reduction.
 
-- **LightningModule (`TemplateClassifier`)**: The core class handling the training loop, optimization, logging, and metrics. It wraps any standard `nn.Module`.
-- **Lightning CLI**: Training is driven by configuration files in `configs/`, promoting "Configuration as Code". The CLI supports overrides via command-line arguments.
+- **LightningModule (`TemplateClassifier`)**: The core class handling the training loop, optimization, logging, and metrics. It wraps any standard `nn.Module` and utilizes centralized `MetricCollection` for streamlined multi-metric tracking (Accuracy, F1, etc.).
+- **Lightning CLI**: The main entry point is `scripts/train.py`, which uses configuration files in `configs/` to promote "Configuration as Code". The CLI supports overrides via command-line arguments.
 
 ### 3. Data Management & Reproducibility
 
@@ -60,7 +59,7 @@ The pipeline is built using **PyTorch Lightning** for state-of-the-art reproduci
 
 ### 5. Code Quality & Standards
 
-- **Type Safety**: The codebase adheres to strict type checking using modern Python 3.10+ syntax (e.g., `list[str] | None`).
+- **Type Safety**: The codebase utilizes comprehensive type hinting using modern Python 3.10+ syntax (e.g., `list[str] | None`) to improve readability and developer experience.
 - **Formatting**: Code is formatted and linted using `ruff` to ensure PEP 8 compliance.
 - **Testing**: A comprehensive test suite (`tests/`) covers unit tests (logic verification) and slower integration tests (end-to-end pipeline).
 
@@ -68,4 +67,5 @@ The pipeline is built using **PyTorch Lightning** for state-of-the-art reproduci
 
 - **uv**: Package management and environment isolation.
 - **PyTorch Lightning**: Deep learning framework.
+- **Albumentations**: Fast and flexible image augmentation library.
 - **WandB**: Experiment tracking and visualization.

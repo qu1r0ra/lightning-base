@@ -1,53 +1,68 @@
 from pathlib import Path
 
+import numpy as np
 import torch
 from lightning import LightningDataModule
-from torch.utils.data import ConcatDataset, DataLoader, Dataset, Subset, random_split
+from sklearn.model_selection import StratifiedKFold
+from torch.utils.data import (
+    ConcatDataset,
+    DataLoader,
+    Dataset,
+    Subset,
+    WeightedRandomSampler,
+    random_split,
+)
 from torchvision.datasets import ImageFolder
-from torchvision.transforms import Compose, ToTensor
 
+from lightning_uv_wandb_template.data.transforms import create_pipeline
 from lightning_uv_wandb_template.utils.constants import (
     BATCH_SIZE,
-    DATA_DIR,
     DEFAULT_SEED,
+    IMAGE_SIZE,
+    ML_SPLIT_DIR,
     NUM_WORKERS,
     PIN_MEMORY,
-    VAL_SPLIT,
 )
 
 
 class TemplateDataModule(LightningDataModule):
     """
-    A unified, simple DataModule template for image classification.
-    Supports pre-split directories, automatic validation splits, and K-Fold CV.
+    An advanced, unified DataModule template for image classification.
+    Supports pre-split directories, automatic validation splits, Stratified K-Fold CV,
+    and WeightedRandomSampler for class imbalance.
     """
 
     def __init__(
         self,
-        data_dir: str | Path = DATA_DIR,
-        val_split: float = VAL_SPLIT,
+        data_dir: str | Path = ML_SPLIT_DIR,
+        val_split: float | None = None,
         batch_size: int = BATCH_SIZE,
+        use_weighted_sampler: bool = False,
+        seed: int = DEFAULT_SEED,
         num_workers: int = NUM_WORKERS,
         pin_memory: bool = PIN_MEMORY,
-        seed: int = DEFAULT_SEED,
         k_fold: int = 1,
         fold_index: int = 0,
+        image_size: int = IMAGE_SIZE,
     ) -> None:
         super().__init__()
         self.save_hyperparameters()
-        self.data_dir = Path(data_dir)
+        self.data_dir = Path(data_dir).resolve()
+
+        self.train_transform = create_pipeline(image_size, is_train=True, is_dl=True)
+        self.val_transform = create_pipeline(image_size, is_train=False, is_dl=True)
 
         self.train_dataset: Dataset | None = None
         self.val_dataset: Dataset | None = None
         self.test_dataset: Dataset | None = None
         self.predict_dataset: Dataset | None = None
+        self.sampler: WeightedRandomSampler | None = None
         self._classes: list[str] | None = None
 
-        # K-Fold state
-        self._pool: Dataset | None = None
-        self._splits: list[tuple[list[int], list[int]]] | None = None
-
-        self.transform = Compose([ToTensor()])
+        self._splits: list[tuple[np.ndarray, np.ndarray]] | None = None
+        self._pool_labels: list[int] | None = None
+        self._train_pool: ConcatDataset | None = None
+        self._val_pool: ConcatDataset | None = None
 
     @property
     def train_dir(self) -> Path:
@@ -70,67 +85,101 @@ class TemplateDataModule(LightningDataModule):
         return len(self._classes) if self._classes else 0
 
     def prepare_data(self) -> None:
-        """Download or unpack data here if necessary."""
+        """
+        Download or initialize data here.
+        Note: This is called only once on a single CPU/GPU.
+        """
         pass
 
     def setup(self, stage: str | None = None) -> None:
         if stage == "fit" or stage is None:
             if self.train_dir.exists() and self.val_dir.exists():
-                train_ds = ImageFolder(root=self.train_dir, transform=self.transform)
-                val_ds = ImageFolder(root=self.val_dir, transform=self.transform)
-                self._classes = train_ds.classes
-                full_ds = ConcatDataset([train_ds, val_ds])
-            elif self.data_dir.exists():
-                full_ds = ImageFolder(root=self.data_dir, transform=self.transform)
-                self._classes = full_ds.classes
-            else:
-                raise FileNotFoundError(f"Data directory {self.data_dir} not found.")
+                if self.hparams.k_fold > 1:
+                    train_ds_no_aug = ImageFolder(root=self.train_dir)
+                    val_ds_no_aug = ImageFolder(root=self.val_dir)
 
-            total_size = len(full_ds)
+                    self._classes = train_ds_no_aug.classes
+                    self._pool_labels = train_ds_no_aug.targets + val_ds_no_aug.targets
 
-            if self.hparams.k_fold > 1:
-                # Generate simple generic K-Folds using PyTorch RNG
-                indices = torch.randperm(
-                    total_size,
-                    generator=torch.Generator().manual_seed(self.hparams.seed),
-                ).tolist()
-                fold_size = total_size // self.hparams.k_fold
-                self._splits = []
-                for i in range(self.hparams.k_fold):
-                    val_start = i * fold_size
-                    val_end = (
-                        (i + 1) * fold_size
-                        if i < self.hparams.k_fold - 1
-                        else total_size
+                    skf = StratifiedKFold(
+                        n_splits=self.hparams.k_fold,
+                        shuffle=True,
+                        random_state=self.hparams.seed,
                     )
-                    val_idx = indices[val_start:val_end]
-                    train_idx = indices[:val_start] + indices[val_end:]
-                    self._splits.append((train_idx, val_idx))
+                    self._splits = list(
+                        skf.split(np.zeros(len(self._pool_labels)), self._pool_labels)
+                    )
 
-                self._pool = full_ds
-                self.set_fold(self.hparams.fold_index)
-            else:
-                # Standard train/val split
-                if self.train_dir.exists() and self.val_dir.exists():
+                    self._train_pool = ConcatDataset(
+                        [
+                            ImageFolder(
+                                root=self.train_dir, transform=self.train_transform
+                            ),
+                            ImageFolder(
+                                root=self.val_dir, transform=self.train_transform
+                            ),
+                        ]
+                    )
+                    self._val_pool = ConcatDataset(
+                        [
+                            ImageFolder(
+                                root=self.train_dir, transform=self.val_transform
+                            ),
+                            ImageFolder(
+                                root=self.val_dir, transform=self.val_transform
+                            ),
+                        ]
+                    )
+
+                    self.set_fold(self.hparams.fold_index)
+                else:
                     self.train_dataset = ImageFolder(
-                        root=self.train_dir, transform=self.transform
+                        root=self.train_dir, transform=self.train_transform
                     )
                     self.val_dataset = ImageFolder(
-                        root=self.val_dir, transform=self.transform
+                        root=self.val_dir, transform=self.val_transform
                     )
-                else:
-                    val_size = int(total_size * self.hparams.val_split)
-                    train_size = total_size - val_size
-                    self.train_dataset, self.val_dataset = random_split(
-                        full_ds,
-                        [train_size, val_size],
-                        generator=torch.Generator().manual_seed(self.hparams.seed),
-                    )
+                    self._classes = self.train_dataset.classes
+
+                    if self.hparams.use_weighted_sampler:
+                        self.sampler = self._create_weighted_sampler(
+                            self.train_dataset.targets
+                        )
+
+            elif self.data_dir.exists():
+                full_ds = ImageFolder(root=self.data_dir)
+                self._classes = full_ds.classes
+
+                total_size = len(full_ds)
+                actual_val_split = (
+                    self.hparams.val_split
+                    if self.hparams.val_split is not None
+                    else 0.2
+                )
+                val_size = int(total_size * actual_val_split)
+                train_size = total_size - val_size
+
+                train_indices, val_indices = random_split(
+                    range(total_size),
+                    [train_size, val_size],
+                    generator=torch.Generator().manual_seed(self.hparams.seed),
+                )
+
+                self.train_dataset = Subset(
+                    ImageFolder(root=self.data_dir, transform=self.train_transform),
+                    train_indices,
+                )
+                self.val_dataset = Subset(
+                    ImageFolder(root=self.data_dir, transform=self.val_transform),
+                    val_indices,
+                )
+            else:
+                raise FileNotFoundError(f"Data directory {self.data_dir} not found.")
 
         if stage == "test" or stage is None:
             if self.test_dir.exists():
                 self.test_dataset = ImageFolder(
-                    root=self.test_dir, transform=self.transform
+                    root=self.test_dir, transform=self.val_transform
                 )
                 self._classes = self.test_dataset.classes
 
@@ -138,13 +187,13 @@ class TemplateDataModule(LightningDataModule):
             predict_root = self.test_dir if self.test_dir.exists() else self.data_dir
             if predict_root.exists():
                 self.predict_dataset = ImageFolder(
-                    root=predict_root, transform=self.transform
+                    root=predict_root, transform=self.val_transform
                 )
 
     def set_fold(self, fold_index: int) -> None:
-        """Sets the active subsets for a specific fold in K-Fold Cross-Validation."""
-        if self._splits is None or self._pool is None:
-            raise RuntimeError("Splits not initialized. Call setup() first.")
+        """Swaps active subsets for K-Fold CV and updates sampler if needed."""
+        if self._splits is None or self._train_pool is None or self._val_pool is None:
+            raise RuntimeError("Base splits not initialized. Call setup() first.")
 
         if not (0 <= fold_index < self.hparams.k_fold):
             raise ValueError(
@@ -154,8 +203,25 @@ class TemplateDataModule(LightningDataModule):
         self.hparams.fold_index = fold_index
         train_idx, val_idx = self._splits[fold_index]
 
-        self.train_dataset = Subset(self._pool, train_idx)
-        self.val_dataset = Subset(self._pool, val_idx)
+        self.train_dataset = Subset(self._train_pool, train_idx)
+        self.val_dataset = Subset(self._val_pool, val_idx)
+
+        if self.hparams.use_weighted_sampler and self._pool_labels is not None:
+            train_labels = [self._pool_labels[i] for i in train_idx]
+            self.sampler = self._create_weighted_sampler(train_labels)
+
+    def _create_weighted_sampler(
+        self, labels: list[int] | np.ndarray
+    ) -> WeightedRandomSampler:
+        """Creates a WeightedRandomSampler to address class imbalance."""
+        targets = np.array(labels)
+        unique_targets, counts = np.unique(targets, return_counts=True)
+        weight = 1.0 / counts
+        weight_map = {t: weight[i] for i, t in enumerate(unique_targets)}
+        samples_weight = np.array([weight_map[t] for t in targets])
+        return WeightedRandomSampler(
+            samples_weight, len(samples_weight), replacement=True
+        )
 
     def train_dataloader(self) -> DataLoader:
         if self.train_dataset is None:
@@ -163,7 +229,8 @@ class TemplateDataModule(LightningDataModule):
         return DataLoader(
             self.train_dataset,
             batch_size=self.hparams.batch_size,
-            shuffle=True,
+            shuffle=True if self.sampler is None else False,
+            sampler=self.sampler,
             num_workers=self.hparams.num_workers,
             pin_memory=self.hparams.pin_memory,
         )

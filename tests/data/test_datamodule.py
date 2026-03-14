@@ -8,7 +8,7 @@ def test_datamodule_defaults() -> None:
 
     assert dm.hparams.batch_size == 32
     assert dm.hparams.seed == 42
-    assert dm.hparams.val_split == 0.2
+    assert dm.hparams.val_split is None
     assert dm.hparams.num_workers == 4
     assert dm.hparams.k_fold == 1
     assert dm.hparams.fold_index == 0

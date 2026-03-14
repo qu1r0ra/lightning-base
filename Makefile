@@ -1,12 +1,8 @@
-.PHONY: help train fast-dev grid-search test test-all lint format clean clean-artifacts
+.PHONY: help train fast-dev grid-search test test-all lint format clean clean-artifacts data-init sync-nb full-check
 
-ifeq (, $(shell which uv))
-    PYTHON = python3
-    PIP = pip3
-else
-    PYTHON = uv run python
-    PIP = uv pip
-endif
+UV := $(shell command -v uv || echo $(HOME)/.local/bin/uv)
+PYTHON = $(UV) run python
+PIP = $(UV) pip
 
 help:
 	@echo "Available commands:"
@@ -19,6 +15,9 @@ help:
 	@echo "  make format       		- Run formatting (ruff format)"
 	@echo "  make clean        		- Remove temporary files and logs"
 	@echo "  make clean-artifacts  	- Remove all generated artifacts (models, checkpoints)"
+	@echo "  make data-init    		- Unzip, setup, and split data"
+	@echo "  make sync-nb      		- Synchronize notebooks with Jupytext scripts"
+	@echo "  make full-check   		- Run format, sync-nb, and test-all before committing"
 
 train:
 	$(PYTHON) scripts/train_full.py
@@ -30,16 +29,16 @@ grid-search:
 	$(PYTHON) scripts/train_grid_search.py
 
 test:
-	uv run pytest -v -s
+	$(UV) run pytest -v -s
 
 test-all:
-	uv run pytest -v -s -m ''
+	$(UV) run pytest -v -s -m ''
 
 lint:
-	uv run ruff check .
+	$(UV) run ruff check .
 
 format:
-	uv run ruff check --fix . && uv run ruff format .
+	$(UV) run ruff check --fix . && $(UV) run ruff format .
 
 clean:
 	find . -type d -name "__pycache__" -exec rm -rf {} +
@@ -50,3 +49,11 @@ clean:
 
 clean-artifacts:
 	rm -rf artifacts/checkpoints artifacts/logs artifacts/predictions
+
+data-init:
+	$(PYTHON) src/lightning_uv_wandb_template/data/utils.py init
+
+sync-nb:
+	$(UV) run jupytext --sync notebooks/**/*.ipynb
+
+full-check: format sync-nb test-all
