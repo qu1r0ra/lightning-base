@@ -1,5 +1,4 @@
 import torch
-import torchmetrics
 from lightning import LightningModule
 from torch import nn
 from torch.optim import AdamW

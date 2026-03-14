@@ -1,10 +1,5 @@
-import matplotlib.pyplot as plt
 import numpy as np
 import torch
-from PIL import Image
-from torch.utils.data import Dataset
-
-from jute_disease.utils.constants import IMAGE_SIZE
 
 
 def denormalize(

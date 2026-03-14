@@ -77,9 +77,14 @@ NORMALIZATION_OPS = A.Compose(
 )
 
 
-def create_pipeline(image_size: int, is_train: bool, is_dl: bool) -> AlbumentationsAdapter:
+def create_pipeline(
+    image_size: int, is_train: bool, is_dl: bool
+) -> AlbumentationsAdapter:
     """Factory to create a full transformation pipeline."""
-    base_group = _get_base_train_ops(image_size) if is_train else _get_base_val_ops(image_size)
+    if is_train:
+        base_group = _get_base_train_ops(image_size)
+    else:
+        base_group = _get_base_val_ops(image_size)
 
     # Flatten the groups to ensure deterministic seed behavior across construction
     transforms = list(base_group.transforms)

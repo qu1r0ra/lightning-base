@@ -59,7 +59,7 @@ def sweep(
 
         cli_arg_string = " ".join(args)
         cmd = (
-            f"uv run python src/lightning_uv_wandb_template/engines/cli.py fit "
+            f"{sys.executable} scripts/train.py fit "
             f"--config {baseline_path} {cli_arg_string}"
         )
 

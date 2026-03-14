@@ -12,10 +12,7 @@ app = typer.Typer(help="Full Training Pipeline")
 @app.command()
 def train(config: str = "configs/baselines/template_baseline.yaml") -> None:
     """Run full training pipeline with PyTorch Lightning CLI."""
-    cmd = (
-        f"uv run python src/lightning_uv_wandb_template/engines/cli.py fit "
-        f"--config {config}"
-    )
+    cmd = f"{sys.executable} scripts/train.py fit --config {config}"
     logger.info(f"Executing: {cmd}")
     exit_code = os.system(cmd)
     if exit_code != 0:

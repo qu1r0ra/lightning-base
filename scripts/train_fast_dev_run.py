@@ -13,7 +13,7 @@ app = typer.Typer(help="Fast Development Run")
 def run(config: str = "configs/baselines/template_baseline.yaml") -> None:
     """Run a fast development run (one batch) to check for errors."""
     cmd = (
-        f"uv run python src/lightning_uv_wandb_template/engines/cli.py fit "
+        f"{sys.executable} scripts/train.py fit "
         f"--config {config} --trainer.fast_dev_run true"
     )
     logger.info(f"Executing: {cmd}")
