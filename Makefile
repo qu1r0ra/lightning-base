@@ -1,4 +1,4 @@
-.PHONY: help train fast-dev grid-search test test-all lint format clean clean-artifacts
+.PHONY: help train fast-dev grid-search test test-all lint format clean clean-artifacts data-init sync-nb full-check
 
 UV := $(shell command -v uv || echo $(HOME)/.local/bin/uv)
 PYTHON = $(UV) run python
@@ -17,6 +17,7 @@ help:
 	@echo "  make clean-artifacts  	- Remove all generated artifacts (models, checkpoints)"
 	@echo "  make data-init    		- Unzip, setup, and split data"
 	@echo "  make sync-nb      		- Synchronize notebooks with Jupytext scripts"
+	@echo "  make full-check   		- Run format, sync-nb, and test-all before committing"
 
 train:
 	$(PYTHON) scripts/train_full.py
@@ -54,3 +55,5 @@ data-init:
 
 sync-nb:
 	$(UV) run jupytext --sync notebooks/**/*.ipynb
+
+full-check: format sync-nb test-all
