@@ -39,10 +39,24 @@ This document captures high-level insights, architectural decisions, and documen
 - **Reproducibility**: Note any deviations from the standard environment that were required for specific experiments.
 - **UV Path**: `Makefile` now uses a shortened, OS-agnostic path resolution for `uv`.
 
-### 3. Centralized Metric Management
+- **Standard**: Define metrics in `src/lightning_uv_wandb_template/utils/metrics.py` using factory functions.
+- **Reasoning**: Ensures metrics are initialized with the correct `num_classes` at runtime, preventing mismatches in polymorphic tasks.
+- **Integration**: `LightningModule` subclasses call these factories during `__init__`.
 
-- **Standard**: Define all training and evaluation metrics in `src/lightning_uv_wandb_template/utils/metrics.py` using `MetricCollection`.
-- **Integration**: `LightningModule` subclasses should clone these collections to ensure consistent metric computation across different stages (train/val/test).
+### 4. Integration Testing (Smoke Tests)
+
+- **Insight**: Unit tests verify isolated logic, but don't catch loop failures.
+- **Standard**: Use `fast_dev_run=True` in integration tests (`tests/integration/`) with mock data to smoke-test the entire training loop efficiently.
+
+### 5. Pydantic Schemas
+
+- **Insight**: Moved validation logic to a dedicated `src/lightning_uv_wandb_template/schemas/` package.
+- **Benefit**: Separates configuration validation from general utilities, providing a structured way to handle hyperparameters outside of YAML.
+
+### 6. Entry Point Reorganization
+
+- **Insight**: Decoupled the core `LightningCLI` runner from top-level project scripts.
+- **Verdict**: The main entry point is `scripts/train.py`, which is invoked by higher-level runners (e.g., `train_full.py`, `train_grid_search.py`) via subprocesses. This ensures that experiment logic remains isolated and cleanly configurable.
 
 ## Architectural Debt and Design Choices
 
@@ -53,7 +67,10 @@ This document captures high-level insights, architectural decisions, and documen
 
 ## Current Status
 
-- **Deep Learning**: Advanced `TemplateClassifier` implemented with centralized metrics and AdamW/ReduceLROnPlateau.
+- **Deep Learning**: `TemplateClassifier` implemented with centralized metrics and dynamic factory patterns.
 - **Classical ML**: Scikit-learn integrated for advanced splitting (Stratified K-Fold).
-- **Data Pipeline**: Automated with `make data-init` (unzip, setup, split). Using Albumentations for augmentation.
-- **Next Task**: Model training and evaluation on specific datasets.
+- **Data Pipeline**: Automated with `make data-init`. Using Albumentations for augmentation.
+- **Validation**: Strict Pydantic schemas implemented in `schemas/config.py`.
+- **Infrastructure**: Entry points reorganized under `scripts/` with decoupled CLI logic.
+- **Testing**: Passing 6 tests, including end-to-end training loop smoke tests.
+- **Quality**: Verified clean state (formatting, linting, notebook sync) via `make full-check`.
