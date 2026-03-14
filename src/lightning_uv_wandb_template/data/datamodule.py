@@ -8,8 +8,8 @@ from torchvision.transforms import Compose, ToTensor
 
 from lightning_uv_wandb_template.utils.constants import (
     BATCH_SIZE,
-    DATA_DIR,
     DEFAULT_SEED,
+    ML_SPLIT_DIR,
     NUM_WORKERS,
     PIN_MEMORY,
     VAL_SPLIT,
@@ -24,7 +24,7 @@ class TemplateDataModule(LightningDataModule):
 
     def __init__(
         self,
-        data_dir: str | Path = DATA_DIR,
+        data_dir: str | Path = ML_SPLIT_DIR,
         val_split: float = VAL_SPLIT,
         batch_size: int = BATCH_SIZE,
         num_workers: int = NUM_WORKERS,
@@ -43,7 +43,6 @@ class TemplateDataModule(LightningDataModule):
         self.predict_dataset: Dataset | None = None
         self._classes: list[str] | None = None
 
-        # K-Fold state
         self._pool: Dataset | None = None
         self._splits: list[tuple[list[int], list[int]]] | None = None
 
@@ -89,7 +88,6 @@ class TemplateDataModule(LightningDataModule):
             total_size = len(full_ds)
 
             if self.hparams.k_fold > 1:
-                # Generate simple generic K-Folds using PyTorch RNG
                 indices = torch.randperm(
                     total_size,
                     generator=torch.Generator().manual_seed(self.hparams.seed),
@@ -110,7 +108,6 @@ class TemplateDataModule(LightningDataModule):
                 self._pool = full_ds
                 self.set_fold(self.hparams.fold_index)
             else:
-                # Standard train/val split
                 if self.train_dir.exists() and self.val_dir.exists():
                     self.train_dataset = ImageFolder(
                         root=self.train_dir, transform=self.transform
